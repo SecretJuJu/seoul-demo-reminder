@@ -1,0 +1,27 @@
+{
+  "extends": "./tsconfig.paths.json",
+  "compilerOptions": {
+    "module": "CommonJS",
+    "lib": ["es6"],
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "noImplicitReturns": true,
+    "preserveConstEnums": true,
+    "forceConsistentCasingInFileNames": true,
+    "sourceMap": true,
+    "target": "es6",
+    "outDir": "dist",
+    "skipLibCheck": true
+  },
+  "include": ["src/**/*.ts", "serverless.ts"],
+  "exclude": [
+    "node_modules",
+    "build"
+  ],
+  "ts-node": {
+    "require": ["tsconfig-paths/register"]
+  }
+}

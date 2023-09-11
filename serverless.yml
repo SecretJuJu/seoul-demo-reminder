@@ -1,0 +1,79 @@
+service: typescript-serverless-skeleton
+
+provider:
+  name: aws
+  runtime: nodejs18.x
+  stage: dev
+  region: ap-northeast-2
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - cloudformation:Describe*
+        - cloudformation:List*
+        - cloudformation:Get*
+        - cloudformation:CreateStack
+        - cloudformation:UpdateStack
+        - cloudformation:DeleteStack
+        - cloudformation:CreateChangeSet
+        - cloudformation:ExecuteChangeSet
+        - cloudformation:DeleteChangeSet
+        - cloudformation:ValidateTemplate
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - lambda:*
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - s3:CreateBucket
+        - s3:ListBucket
+        - s3:GetBucketLocation
+        - s3:DeleteBucket
+        - s3:PutObject
+        - s3:GetObject
+        - s3:DeleteObject
+        # @see https://github.com/serverless/serverless/issues/5919
+        - s3:GetEncryptionConfiguration
+        - s3:PutEncryptionConfiguration
+        - s3:DeleteBucketPolicy
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - logs:CreateLogGroup
+        - logs:DeleteLogGroup
+        - logs:CreateLogStream
+        - logs:DeleteLogStream
+        - logs:PutLogEvents
+        - logs:DescribeLogGroups
+        - logs:DescribeLogStreams
+        - logs:TagResource
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - apigateway:GET
+        - apigateway:POST
+        - apigateway:PUT
+        - apigateway:DELETE
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - iam:GetRole
+        - iam:DeleteRolePolicy
+        - iam:CreateRole
+        - iam:DeleteRole
+        - iam:PutRolePolicy
+        - iam:PassRole
+      Resource: '*'
+
+functions:
+  hello:
+    handler: src/storeDemoInfos.hello
+    events:
+      - http:
+          path: hello
+          method: get
+
+plugins:
+  - serverless-plugin-typescript
+  - serverless-offline
+  - serverless-tscpaths
