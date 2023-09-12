@@ -1,10 +1,17 @@
-service: typescript-serverless-skeleton
+service: seoul-demo-reminder
+
+useDotenv: true
 
 provider:
   name: aws
   runtime: nodejs18.x
-  stage: dev
   region: ap-northeast-2
+  stage: ${opt:stage, 'dev'}
+  environment:
+    IS_LOCAL: ${env:IS_LOCAL}
+    DYNAMO_AWS_ACCESS_KEY: ${env:DYNAMO_AWS_ACCESS_KEY}
+    DYNAMO_AWS_SECRET_ACCESS_KEY: ${env:DYNAMO_AWS_SECRET_ACCESS_KEY}
+    DYNAMO_AWS_REGION: ${env:DYNAMO_AWS_REGION}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -64,16 +71,40 @@ provider:
         - iam:PutRolePolicy
         - iam:PassRole
       Resource: '*'
+    - Effect: Allow
+      Action:
+        - states:*
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/notice'
 
 functions:
-  hello:
-    handler: src/storeDemoInfos.hello
+  # 3시간마다 실행되는 스케줄러
+  storeDemoInfos:
+    handler: src/handler.storeDemoInfos
     events:
+      - schedule: rate(3 hours)
+      # 개발용 엔드포인트
       - http:
-          path: hello
+          path: store-demo-infos
           method: get
+          cors: true
 
 plugins:
+  - serverless-dotenv-plugin
   - serverless-plugin-typescript
   - serverless-offline
   - serverless-tscpaths
+  - serverless-dynamodb-local
+
+custom:
+  dynamodb:
+    start:
+      port: 8000
+      inMemory: true
+      migrate: true
+
+  dotenv:
+    path: .env.${self:provider.stage}
