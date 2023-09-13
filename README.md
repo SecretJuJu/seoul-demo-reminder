@@ -39,3 +39,5 @@
   - atlas mongodb 에서 무료로 클러스터를 사용할 수 있기 때문
 - email 을 사용하는 이유
   - 알림을 보내는 가장 쉬운 방법이라고 생각
+- ses 를 사용하려 했으나 메일 인증이 귀찮아서 nodeMailer 를 사용
+  - https://www.cckn.dev/dev/2000-9-nodemailer/ 참고해서 구글 이메일 설정

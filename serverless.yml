@@ -9,17 +9,16 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     IS_LOCAL: ${env:IS_LOCAL}
-    DYNAMO_AWS_ACCESS_KEY: ${env:DYNAMO_AWS_ACCESS_KEY}
-    DYNAMO_AWS_SECRET_ACCESS_KEY: ${env:DYNAMO_AWS_SECRET_ACCESS_KEY}
-    DYNAMO_AWS_REGION: ${env:DYNAMO_AWS_REGION}
+    MONGO_DB_USERNAME: ${env:MONGO_DB_USERNAME}
+    MONGO_DB_PASSWORD: ${env:MONGO_DB_PASSWORD}
+    MONGO_DB_HOST: ${env:MONGO_DB_HOST}
     SQS_AWS_ACCESS_KEY: ${env:SQS_AWS_ACCESS_KEY}
     SQS_AWS_SECRET_ACCESS_KEY: ${env:SQS_AWS_SECRET_ACCESS_KEY}
     SQS_AWS_REGION: ${env:SQS_AWS_REGION}
     SQS_URL: ${env:SQS_URL}
-    SES_AWS_ACCESS_KEY: ${env:SES_AWS_ACCESS_KEY}
-    SES_AWS_SECRET_ACCESS_KEY: ${env:SES_AWS_SECRET_ACCESS_KEY}
-    SES_AWS_REGION: ${env:SES_AWS_REGION}
-    SES_SENDER_ADDRESS: ${env:SES_SENDER_ADDRESS}
+    EMAIL_SENDER_ADDRESS: ${env:EMAIL_SENDER_ADDRESS}
+    EMAIL_SENDER_PASSWORD: ${env:EMAIL_SENDER_PASSWORD}
+
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -107,21 +106,18 @@ functions:
           path: store-demo-infos
           method: get
           cors: true
-
     # sqs 로 email 알림을 보내는 함수
-    sendEmail:
-      handler: src/handler.send-email
-      events:
-        - sqs:
-            arn: ${env:SQS_AWS_ARN}
-            batchSize: 1
-            enabled: true
-            maximumRetryAttempts: 3
-            # 개발용 엔드포인트
-        - http:
-            path: send-email
-            method: get
-            cors: true
+  sendEmail:
+    handler: src/handler.sendEmail
+    events:
+      - sqs:
+          arn: ${env:SQS_AWS_ARN}
+          batchSize: 1
+          enabled: true
+      - http:
+          path: send-email
+          method: get
+          cors: true
 
 plugins:
   - serverless-dotenv-plugin
