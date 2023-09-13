@@ -1,6 +1,15 @@
 import axios from 'axios';
-import { Notice, NoticeAttribute } from '../../common/dynamodb';
 import { stringify } from 'qs';
+import { sendSqsMessage } from '../../common/sqs';
+import { initMongo } from '../../common/mongodb';
+import { NoticeAttribute, noticeModel } from '../../common/mongodb/models/notice.model';
+
+export interface NoticeEmailItem {
+  bdwrSeq: string;
+  bdwrTtlNm: string;
+  bdwrCts: string;
+  createDate: string;
+}
 
 async function fetchNotices(): Promise<NoticeAttribute[]> {
   const response = await axios.request({
@@ -20,6 +29,8 @@ async function fetchNotices(): Promise<NoticeAttribute[]> {
 }
 
 export const handler = async (): Promise<object> => {
+  await initMongo();
+
   let notices: NoticeAttribute[] = [];
   try {
     notices = await fetchNotices();
@@ -36,10 +47,10 @@ export const handler = async (): Promise<object> => {
 
   const noticeSequences = notices.map((notice: NoticeAttribute) => notice.bdwrSeq);
 
-  const alreadyNotices = await Notice.batchGet(noticeSequences);
-  const alreadyNoticeSequences = alreadyNotices.map((notice) => {
-    return notice.bdwrSeq;
-  });
+  const alreadyNotices = await noticeModel.find({ bdwrSeq: { $in: noticeSequences } });
+  // const alreadyNotices = await Notice.batchGet(noticeSequences);
+  // 이미 존재하는 notice 들을 제외하기위해 이미 존재하는 notice 의 sequence 들을 배열로 만듬 (noticeModel 는 mongodb notice 스키마)
+  const alreadyNoticeSequences = alreadyNotices.map((notice: NoticeAttribute) => notice.bdwrSeq);
 
   const newNotices = notices.filter((notice: NoticeAttribute) => {
     const isAlready =
@@ -52,11 +63,23 @@ export const handler = async (): Promise<object> => {
   console.log('new notices count: ', newNotices.length);
 
   // add new Notices to DynamoDB
-  // 100개씩 나눠서 put
   if (newNotices.length > 0) {
-    await Notice.batchPut(newNotices);
-  }
+    await noticeModel.insertMany(newNotices);
 
+    // send sqs queue
+    await sendSqsMessage(
+      JSON.stringify(
+        newNotices.map((notice): NoticeEmailItem => {
+          return {
+            bdwrSeq: notice.bdwrSeq,
+            bdwrTtlNm: notice.bdwrTtlNm,
+            bdwrCts: notice.bdwrCts,
+            createDate: notice.createDate,
+          };
+        }),
+      ),
+    );
+  }
   return {
     statusCode: 200,
     body: JSON.stringify({

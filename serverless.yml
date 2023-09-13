@@ -12,6 +12,14 @@ provider:
     DYNAMO_AWS_ACCESS_KEY: ${env:DYNAMO_AWS_ACCESS_KEY}
     DYNAMO_AWS_SECRET_ACCESS_KEY: ${env:DYNAMO_AWS_SECRET_ACCESS_KEY}
     DYNAMO_AWS_REGION: ${env:DYNAMO_AWS_REGION}
+    SQS_AWS_ACCESS_KEY: ${env:SQS_AWS_ACCESS_KEY}
+    SQS_AWS_SECRET_ACCESS_KEY: ${env:SQS_AWS_SECRET_ACCESS_KEY}
+    SQS_AWS_REGION: ${env:SQS_AWS_REGION}
+    SQS_URL: ${env:SQS_URL}
+    SES_AWS_ACCESS_KEY: ${env:SES_AWS_ACCESS_KEY}
+    SES_AWS_SECRET_ACCESS_KEY: ${env:SES_AWS_SECRET_ACCESS_KEY}
+    SES_AWS_REGION: ${env:SES_AWS_REGION}
+    SES_SENDER_ADDRESS: ${env:SES_SENDER_ADDRESS}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -77,8 +85,16 @@ provider:
       Resource: '*'
     - Effect: Allow
       Action:
-        - dynamodb:*
-      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/notice'
+        - mongodb:*
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - events:*
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - sqs:*
+      Resource: '*'
 
 functions:
   # 3시간마다 실행되는 스케줄러
@@ -92,19 +108,27 @@ functions:
           method: get
           cors: true
 
+    # sqs 로 email 알림을 보내는 함수
+    sendEmail:
+      handler: src/handler.send-email
+      events:
+        - sqs:
+            arn: ${env:SQS_AWS_ARN}
+            batchSize: 1
+            enabled: true
+            maximumRetryAttempts: 3
+            # 개발용 엔드포인트
+        - http:
+            path: send-email
+            method: get
+            cors: true
+
 plugins:
   - serverless-dotenv-plugin
   - serverless-plugin-typescript
   - serverless-offline
   - serverless-tscpaths
-  - serverless-dynamodb-local
 
 custom:
-  dynamodb:
-    start:
-      port: 8000
-      inMemory: true
-      migrate: true
-
   dotenv:
     path: .env.${self:provider.stage}

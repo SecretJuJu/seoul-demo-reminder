@@ -1,39 +1,3 @@
-import * as dynamoose from 'dynamoose';
-import * as clientDynamoDB from '@aws-sdk/client-dynamodb';
-
-const isLocal = process.env.IS_LOCAL === 'true';
-
-if (isLocal) {
-  const ddb = new clientDynamoDB.DynamoDB([
-    {
-      endpoint: 'http://localhost:8000',
-      region: 'local',
-    },
-  ]);
-
-  dynamoose.aws.ddb.set(ddb);
-} else {
-  const { DYNAMO_AWS_ACCESS_KEY, DYNAMO_AWS_SECRET_ACCESS_KEY, DYNAMO_AWS_REGION } = process.env;
-
-  if (!DYNAMO_AWS_ACCESS_KEY || !DYNAMO_AWS_SECRET_ACCESS_KEY || !DYNAMO_AWS_REGION) {
-    throw new Error(
-      'DYNAMO_AWS_ACCESS_KEY_ID, DYNAMO_AWS_SECRET_ACCESS_KEY, DYNAMO_AWS_REGION are required',
-    );
-  }
-
-  const ddb = new clientDynamoDB.DynamoDB([
-    {
-      credentials: {
-        accessKeyId: DYNAMO_AWS_ACCESS_KEY,
-        secretAccessKey: DYNAMO_AWS_SECRET_ACCESS_KEY,
-      },
-      region: DYNAMO_AWS_REGION,
-    },
-  ]);
-
-  dynamoose.aws.ddb.set(ddb);
-}
-
 /**
  * {
  *             "bdwrSeq": "3605",
@@ -43,25 +7,23 @@ if (isLocal) {
  *             "createDate": "2023-09-05 09:17:30",
  *         }
  */
+import mongoose from 'mongoose';
 
 export interface NoticeAttribute {
   bdwrSeq: string;
   bdwrTtlNm: string;
   bdwrCts: string;
-  updateDate: string;
   createDate: string;
-  alarmDate?: Date;
+  updateDate?: string;
 }
 
-const noticeSchema = new dynamoose.Schema({
-  bdwrSeq: {
-    type: String,
-    hashKey: true,
-  },
-  bdwrTtlNm: String,
-  bdwrCts: String,
-  updateDate: String,
-  createDate: String,
+// mongodb notice 스키마
+export const noticeSchema = new mongoose.Schema({
+  bdwrSeq: { type: String, required: true, unique: true },
+  bdwrTtlNm: { type: String, required: true },
+  bdwrCts: { type: String, required: true },
+  createDate: { type: String, required: true },
+  updateDate: { type: String, required: false },
 });
 
-export const Notice = dynamoose.model('Notice', noticeSchema);
+export const noticeModel = mongoose.model('Notice', noticeSchema);
