@@ -96,11 +96,11 @@ provider:
       Resource: '*'
 
 functions:
-  # 3시간마다 실행되는 스케줄러
+  # 1시간마다 실행되는 스케줄러
   storeDemoInfos:
     handler: src/handler.storeDemoInfos
     events:
-      - schedule: rate(3 hours)
+      - schedule: rate(30 minutes)
       # 개발용 엔드포인트
       - http:
           path: store-demo-infos
