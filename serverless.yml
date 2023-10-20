@@ -109,7 +109,7 @@ functions:
     # sqs 로 email 알림을 보내는 함수
   sendEmail:
     handler: src/handler.sendEmail
-    timeout: 15
+    timeout: 30
     events:
       - sqs:
           arn: ${env:SQS_AWS_ARN}
