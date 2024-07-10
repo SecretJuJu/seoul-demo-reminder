@@ -97,13 +97,13 @@ provider:
 
 functions:
   # 1시간마다 실행되는 스케줄러
-  storeDemoInfos:
+  main:
     handler: src/handler.main
     events:
       - schedule: rate(30 minutes)
       # 개발용 엔드포인트
       - http:
-          path: store-demo-infos
+          path: main
           method: get
           cors: true
     # sqs 로 email 알림을 보내는 함수
@@ -128,4 +128,4 @@ plugins:
 
 custom:
   dotenv:
-    path: .env.${self:provider.stage}
+    path: .env.prod
