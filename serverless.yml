@@ -99,6 +99,7 @@ functions:
   # 1시간마다 실행되는 스케줄러
   main:
     handler: src/handler.main
+    timeout: 30
     events:
       - schedule: rate(30 minutes)
       # 개발용 엔드포인트
