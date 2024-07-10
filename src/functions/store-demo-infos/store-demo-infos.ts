@@ -40,7 +40,7 @@ export const handler = async (): Promise<object> => {
     return {
       statusCode: 500,
       body: JSON.stringify({
-        message: 'Error occurred while fetching notices',
+        message: 'Error occurred while fetching notice',
       }),
     };
   }
@@ -60,7 +60,7 @@ export const handler = async (): Promise<object> => {
     return !isAlready;
   });
 
-  console.log('new notices count: ', newNotices.length);
+  console.log('new notice count: ', newNotices.length);
 
   // add new Notices to DynamoDB
   if (newNotices.length > 0) {
