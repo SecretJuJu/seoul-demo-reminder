@@ -94,6 +94,10 @@ provider:
       Action:
         - sqs:*
       Resource: '*'
+    - Effect: Allow
+      Action:
+        - dynamodb:*
+      Resource: '*'
 
 functions:
   # 1시간마다 실행되는 스케줄러

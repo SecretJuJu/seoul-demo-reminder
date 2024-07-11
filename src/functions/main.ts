@@ -2,6 +2,7 @@ import { fetchTopis } from '../crawler/fetch-topis';
 import { filterNewNotices } from '../notice/filter-new-notices';
 import { sendSqsMessage } from '../common/sqs';
 import { initMongo } from '../common/mongodb';
+import { storeNewNotices } from '../notice/store-new-notices';
 
 export interface MainHandlerResponse {
   statusCode: number;
@@ -34,6 +35,7 @@ export const handler = async (): Promise<MainHandlerResponse> => {
     };
   });
   await sendSqsMessage(JSON.stringify(messages));
+  await storeNewNotices(newNotices);
 
   return {
     statusCode: 200,
