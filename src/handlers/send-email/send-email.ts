@@ -4,6 +4,7 @@ import * as nodeMailer from 'nodemailer';
 import { getEnv } from '../../common/utils';
 import { getMessageFromEvent } from '../../common/sqs';
 import { DividedNoticeEmailChunk } from '../divide-emails/divide-notice-emails';
+import { alertError } from '../../common/alert';
 
 export const handler = async (event: SQSEvent) => {
   const transporter = nodeMailer.createTransport({
@@ -26,7 +27,11 @@ export const handler = async (event: SQSEvent) => {
       html: contents,
     };
 
-    await transporter.sendMail(mailOptions);
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (err) {
+      await alertError(err);
+    }
     // sleep for 0.5 sec
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
