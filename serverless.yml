@@ -12,10 +12,11 @@ provider:
     MONGO_DB_USERNAME: ${env:MONGO_DB_USERNAME}
     MONGO_DB_PASSWORD: ${env:MONGO_DB_PASSWORD}
     MONGO_DB_HOST: ${env:MONGO_DB_HOST}
-    SQS_AWS_ACCESS_KEY: ${env:SQS_AWS_ACCESS_KEY}
-    SQS_AWS_SECRET_ACCESS_KEY: ${env:SQS_AWS_SECRET_ACCESS_KEY}
     SQS_AWS_REGION: ${env:SQS_AWS_REGION}
-    SQS_URL: ${env:SQS_URL}
+    SEND_EMAIL_SQS_URL: ${env:SEND_EMAIL_SQS_URL}
+    SEND_EMAIL_SQS_ARN: ${env:SEND_EMAIL_SQS_ARN}
+    DIVIDE_EMAIL_SQS_URL: ${env:DIVIDE_EMAIL_SQS_URL}
+    DIVIDE_EMAIL_SQS_ARN: ${env:DIVIDE_EMAIL_SQS_ARN}
     EMAIL_SENDER_ADDRESS: ${env:EMAIL_SENDER_ADDRESS}
     EMAIL_SENDER_PASSWORD: ${env:EMAIL_SENDER_PASSWORD}
 
@@ -98,6 +99,14 @@ provider:
       Action:
         - dynamodb:*
       Resource: '*'
+    - Effect: Allow
+      Action:
+        - cognito-user-pools:*
+      Resource: '*'
+    - Effect: Allow
+      Action:
+        - cognito-idp:*
+      Resource: '*'
 
 functions:
   # 1시간마다 실행되는 스케줄러
@@ -111,14 +120,22 @@ functions:
           path: main
           method: get
           cors: true
-    # sqs 로 email 알림을 보내는 함수
+  divideNoticeEmails:
+    handler: src/handler.divideNoticeEmails
+    timeout: 30
+    events:
+      - sqs:
+          arn: ${env:DIVIDE_EMAIL_SQS_ARN}
+          batchSize: 1
+          enabled: true
+  # sqs 로 email 알림을 보내는 함수
   sendEmail:
     handler: src/handler.sendEmail
     timeout: 30
     events:
       - sqs:
-          arn: ${env:SQS_AWS_ARN}
-          batchSize: 1
+          arn: ${env:SEND_EMAIL_SQS_ARN}
+          batchSize: 5
           enabled: true
       - http:
           path: send-email

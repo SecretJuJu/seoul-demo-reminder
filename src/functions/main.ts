@@ -1,6 +1,6 @@
 import { fetchTopis } from '../crawler/fetch-topis';
 import { filterNewNotices } from '../notice/filter-new-notices';
-import { sendSqsMessage } from '../common/sqs';
+import { sendToDivideEmailQueue } from '../common/sqs';
 import { initMongo } from '../common/mongodb';
 import { storeNewNotices } from '../notice/store-new-notices';
 
@@ -34,7 +34,7 @@ export const handler = async (): Promise<MainHandlerResponse> => {
       createDate: notice.createDate,
     };
   });
-  await sendSqsMessage(JSON.stringify(messages));
+  await sendToDivideEmailQueue(JSON.stringify(messages));
   await storeNewNotices(newNotices);
 
   return {

@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { stringify } from 'qs';
-import { sendSqsMessage } from '../../common/sqs';
+import { sendToSendEmailQueue } from '../../common/sqs';
 import { initMongo } from '../../common/mongodb';
 import { NoticeAttribute, noticeModel } from '../../common/mongodb/models/notice.model';
 
@@ -67,7 +67,7 @@ export const handler = async (): Promise<object> => {
     await noticeModel.insertMany(newNotices);
 
     // send sqs queue
-    await sendSqsMessage(
+    await sendToSendEmailQueue(
       JSON.stringify(
         newNotices.map((notice): NoticeEmailItem => {
           return {
