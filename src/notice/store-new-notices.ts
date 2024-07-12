@@ -1,6 +1,6 @@
-import { NoticeAttribute } from '../common/mongodb/models/notice.model';
 import { dynamodb } from '../common/dynamodb';
 import { getEnv } from '../common/utils';
+import { NoticeAttribute } from './type';
 
 export const storeNewNotices = async (notices: NoticeAttribute[]) => {
   await dynamodb

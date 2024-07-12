@@ -1,5 +1,5 @@
-import { NoticeAttribute } from '../common/mongodb/models/notice.model';
 import axios from 'axios';
+import { NoticeAttribute } from '../notice/type';
 
 const fetchFromTopis = async (): Promise<NoticeAttribute[]> => {
   const response = await axios.request<{

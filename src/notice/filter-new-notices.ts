@@ -1,7 +1,7 @@
-import { NoticeAttribute } from '../common/mongodb/models/notice.model';
 import { dynamodb } from '../common/dynamodb';
 import { getEnv } from '../common/utils';
 import { ItemList } from 'aws-sdk/clients/dynamodb';
+import { NoticeAttribute } from './type';
 
 const getDynamoDBKeys = (notices: NoticeAttribute[]) => {
   return notices.map((notice) => ({

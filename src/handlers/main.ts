@@ -1,7 +1,6 @@
 import { fetchTopis } from '../crawler/fetch-topis';
 import { filterNewNotices } from '../notice/filter-new-notices';
 import { sendToDivideEmailQueue } from '../common/sqs';
-import { initMongo } from '../common/mongodb';
 import { storeNewNotices } from '../notice/store-new-notices';
 
 export interface MainHandlerResponse {
@@ -10,8 +9,6 @@ export interface MainHandlerResponse {
 }
 
 export const handler = async (): Promise<MainHandlerResponse> => {
-  await initMongo();
-
   const notices = await fetchTopis();
 
   const newNotices = await filterNewNotices(notices);

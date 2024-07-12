@@ -9,9 +9,6 @@ provider:
   stage: ${opt:stage, 'dev'}
   environment:
     IS_LOCAL: ${env:IS_LOCAL}
-    MONGO_DB_USERNAME: ${env:MONGO_DB_USERNAME}
-    MONGO_DB_PASSWORD: ${env:MONGO_DB_PASSWORD}
-    MONGO_DB_HOST: ${env:MONGO_DB_HOST}
     SQS_AWS_REGION: ${env:SQS_AWS_REGION}
     SEND_EMAIL_SQS_URL: ${env:SEND_EMAIL_SQS_URL}
     SEND_EMAIL_SQS_ARN: ${env:SEND_EMAIL_SQS_ARN}
