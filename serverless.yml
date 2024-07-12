@@ -147,4 +147,5 @@ plugins:
 
 custom:
   dotenv:
-    path: .env.prod
+    # stage가 dev면 .env.dev, stage가 prod면 .env.prod
+    path: .env.${self:provider.stage}
