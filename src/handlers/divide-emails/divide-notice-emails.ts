@@ -47,7 +47,7 @@ export const handler = async (event: SQSEvent) => {
   // 전송 대상들
   const emails = await listAllEnabledUserEmails();
 
-  const chunkMaxSize = 30;
+  const chunkMaxSize = 10;
   const chunks: DividedNoticeEmailChunk[] = [];
 
   const emailChunks = lodash.chunk(emails, chunkMaxSize);

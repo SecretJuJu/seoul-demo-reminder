@@ -19,16 +19,21 @@ export const handler = async (event: SQSEvent) => {
   const message = getMessageFromEvent(event)[0];
   const { emails, contents } = JSON.parse(message) as DividedNoticeEmailChunk;
 
-  const mailOptions: Mail.Options = {
-    from: getEnv('EMAIL_SENDER_ADDRESS'),
-    to: emails,
-    subject: '서울시 집회/행사 알림',
-    html: contents,
-  };
+  // user 별로 각각의 customer 에게 email 보내기
+  for (const email of emails) {
+    const mailOptions: Mail.Options = {
+      from: getEnv('EMAIL_SENDER_ADDRESS'),
+      to: email,
+      subject: '서울시 집회/행사 알림',
+      html: contents,
+    };
 
-  try {
-    await transporter.sendMail(mailOptions);
-  } catch (err) {
-    await alertError(err);
+    try {
+      await transporter.sendMail(mailOptions);
+    } catch (err) {
+      await alertError(err);
+    }
+    // sleep for 0.5 sec
+    await new Promise((resolve) => setTimeout(resolve, 500));
   }
 };
