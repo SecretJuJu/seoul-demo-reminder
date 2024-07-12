@@ -1,6 +1,6 @@
 import { SQSEvent } from 'aws-lambda';
 import { getMessageFromEvent, sendToSendEmailQueue } from '../../common/sqs';
-import { NoticeEmailItem } from '@functions/store-demo-infos/store-demo-infos';
+import { NoticeEmailItem } from '../store-demo-infos/store-demo-infos';
 import { listAllEnabledUserEmails } from '../../common/cognito';
 import * as lodash from 'lodash';
 

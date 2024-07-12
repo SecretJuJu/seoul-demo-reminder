@@ -3,7 +3,7 @@ import { SQSEvent } from 'aws-lambda';
 import * as nodeMailer from 'nodemailer';
 import { getEnv } from '../../common/utils';
 import { getMessageFromEvent } from '../../common/sqs';
-import { DividedNoticeEmailChunk } from '@functions/divide-emails/divide-notice-emails';
+import { DividedNoticeEmailChunk } from '../divide-emails/divide-notice-emails';
 
 export const handler = async (event: SQSEvent) => {
   const transporter = nodeMailer.createTransport({
